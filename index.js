@@ -1,5 +1,6 @@
 // firstExample();
-secondExample();
+// secondExample();
+thirdExample();
 
 function firstExample() {
 	console.log("Priority of the tasks with no time delay.");
@@ -47,6 +48,8 @@ function secondExample() {
 	console.timeLog("s1");
 
 	function codeBlocker() {
+		// ONLY resolving the value happens in the microtask!
+		// Thats why the loop inside will be executed in the main thread.
 		return new Promise((resolve, reject) => {
 			let i = 0;
 			while(i < 1000000000) {i++;}
@@ -58,6 +61,37 @@ function secondExample() {
 		console.log("🐷 Billion loops done");
 		console.timeLog("s1");
 	});
+
+	// L3
+	// SHOULD be executed right away, because it is in the main thread.
+	// But even we wrap or codeBlocker in the Promise, it still will be in the main thread,
+	// because creating of the Promise is still happenning in the current loop.
+	console.log("🥪 Synchronous 3");
+	console.timeLog("s1");
+}
+
+function thirdExample() {
+	console.log("Not blocking main event loop with promise")
+	// L1
+	// Will be executed right away, because it is in the main thread.
+	console.time("s1");
+	console.log("🥪 Synchronous 1");
+	console.timeLog("s1");
+
+	function codeBlocker() {
+		// When we add a resolve, we ensure that all the code below will be
+		// running in the microtask.
+		// ONLY resolving the value happens in the microtask!
+		// Will be executed only when all the current macrotasks will be completed.
+		return Promise.resolve().then((resolve) => {
+			let i = 0;
+			while(i < 1000000000) {i++;}
+			console.log("🐷 Billion loops done");
+			console.timeLog("s1");
+		});
+	}
+
+	codeBlocker();
 
 	// L3
 	// SHOULD be executed right away, because it is in the main thread.
