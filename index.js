@@ -1,6 +1,7 @@
 // firstExample();
 // secondExample();
-thirdExample();
+// thirdExample();
+asyncExample();
 
 function firstExample() {
 	console.log("Priority of the tasks with no time delay.");
@@ -99,4 +100,23 @@ function thirdExample() {
 	// because creating of the Promise is still happenning in the current loop.
 	console.log("🥪 Synchronous 3");
 	console.timeLog("s1");
+}
+
+function asyncExample() {
+	// Every function with an async keyword returs Promise as a result.
+	const getFruit = async (fruitName) => {
+		const fruits = {
+			"apple": "🍏",
+			"pineapple": "🍍",
+			"peach": "🍑"
+		};
+
+		return fruits[fruitName];
+	};
+
+	// Returns promise
+	// console.log("getFruit", getFruit("peach"));
+
+	// We should resolve the promise when we want to get a fruit
+	getFruit("peach").then(val => console.log(val));
 }
