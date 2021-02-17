@@ -83,7 +83,7 @@ function thirdExample() {
 		// When we add a resolve, we ensure that all the code below will be
 		// running in the microtask.
 		// ONLY resolving the value happens in the microtask!
-		// Will be executed only when all the current macrotasks will be completed.
+		// Will be executed onl y when all the current macrotasks will be completed.
 		return Promise.resolve().then((resolve) => {
 			let i = 0;
 			while(i < 1000000000) {i++;}
@@ -108,8 +108,13 @@ function asyncExample() {
 		const fruits = {
 			"apple": "🍏",
 			"pineapple": "🍍",
-			"peach": "🍑"
+			"peach": "🍑",
+			"strawberry": "🍓",
 		};
+
+		await new Promise(resolve => {
+			setTimeout(resolve, 1000);
+		});
 
 		return fruits[fruitName];
 	};
@@ -118,5 +123,35 @@ function asyncExample() {
 	// console.log("getFruit", getFruit("peach"));
 
 	// We should resolve the promise when we want to get a fruit
-	getFruit("peach").then(val => console.log(val));
+	// getFruit("peach").then(console.log);
+
+	const makeSmoothySlow = async () => {
+		// Await pause the execution of the function while it doesn't get a result
+		// Wait until finish 1st request
+		const pineapple = await getFruit("pineapple");
+		// Wait until finish 2nd request
+		const strawberry = await getFruit("strawberry");
+
+		// This function is run the code not in the parallel
+		return [pineapple, strawberry];
+	};
+
+
+	const makeSmoothy = async () => {
+		// Await pause the execution of the function while it doesn't get a result
+		const pineapple = getFruit("pineapple");
+		const strawberry = getFruit("strawberry");
+
+		// Here we run two async functions in parallel
+		const smoothy = await Promise.all([pineapple, strawberry]);
+
+		return smoothy;
+	};
+
+	console.time("s1");
+	makeSmoothySlow().then(val => { console.log(val); console.timeLog("s1"); });
+
+	console.time("s2");
+	makeSmoothy().then(val => { console.log(val); console.timeLog("s2"); });
+	
 }
