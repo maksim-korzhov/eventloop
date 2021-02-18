@@ -2,7 +2,8 @@
 // secondExample();
 // thirdExample();
 // asyncExample();
-mapAsyncExample();
+// mapAsyncExample();
+stepByStepExample();
 
 function firstExample() {
 	console.log("Priority of the tasks with no time delay.");
@@ -227,4 +228,70 @@ function mapAsyncExample() {
 	};
 
 	fruitLoop2();
+}
+function stepByStepExample() {
+	// Basically, there are next struture of the event loop:
+	// 1. Call Stack. It is a stack, so we can add a tasks one by one on the top of it
+	// and it will execute them until they are exists.
+	// 
+	// 2. WebApis. Exept from the event loop we have a browser powers.
+	// So, setTimeout, addEventListeners, Fetch, XMLHttpRequest and many others - are all WebApi.
+	// When we call setStimeout, it goes to the Callback Stack, and goes to the WebApis.
+	// WebApis executes setTimeout and after it is resolves push it's callback to the Callback Queue.
+	// The same with Fetch, XHR and addEventListener - they all called from the Call Stack,
+	// executes using browser WebApis, push they callbacks to the Callback Queue.
+	//
+	// 3. Callback Queue. It is a queue of tasks.
+	// The tasks will go here from the WebApi.
+	//
+	// 4. Event Loop itself.
+	// The only function of the Event Loop - is take the first task from the Callback Queue when Call Stack is empty.
+	// So, it takes the first tasks and push it to the Call Stack, Cal Stack will start immediately to run the task.
+
+	// Example.
+	// Call Stack is empty.
+	// We take the first task and push it to the Call Stack.
+	// It runs it immediatelly, log the value and Call Stack is now empty.
+	console.log("🍏 First step");
+
+	// Call stack is empty.
+	// We push an addEventListener to it.
+	// As it is a Web API, it is goes to the Web Apis area.
+	// Now Web Api is watching for the clicks, but now Call Stack is empty,
+	// Callback Queue is empty.
+	document.addEventListener("click", _ => console.log("🍍 Second step"));
+
+	// Call stack is empty.
+	// We push a setTimeout to it.
+	// As it is a Web API, it is goes to the Web Apis area and waits 1000 second.
+	setTimeout(_ => console.log("🍑 Third step"), 1000);
+
+	// Call stack is empty.
+	// We push the console.log to it, executes it immediately.
+	// So the next line in the console will be the line below.
+	console.log("🍓 Last step");
+
+	// If there was no click until 1 sec is passed,
+	// then timer is finished it is work and push it's callback to the Callback Queue.
+	// Callback queue now has 1 task.
+	// Event loop runs, looks to the Call Stack and see it is empty.
+	// It takes the task from the Callback queue and pushes it to the Call Stack.
+	// Call Stack runs the task and log Third step on the screen.
+
+	// After 1 sec or earlier if there were clicks, addEventListener gets click and
+	// pushes its callback to the Callback Queue.
+	// Event loop get the first taks from this queue(becaues Call Stack is empty)
+	// and pushes it to the Call Stack, where it executes.
+
+	/*
+		Result
+		🍏 First step
+		🍓 Last step
+		🍑 Third step
+
+		// Click
+		🍍 Second step
+		// Click
+		🍍 Second step
+	*/
 }
