@@ -346,3 +346,23 @@ function rAFExample() {
 		
 	});
 }
+
+function moreMicrotaskExamples() {
+	document.addEventListener("click", function() {
+		Promise.resolve().then(() => console.log("Microtask 1"));
+		console.log("Listener 1");
+	});
+
+	document.addEventListener("click", function() {
+		Promise.resolve().then(() => console.log("Microtask 2"));
+		console.log("Listener 2");
+	});
+
+	// If we click using mouse:
+	// Listener 1, Microtask 1, Listener 2, Microtask 2
+
+	// If we click using document.click();
+	// Listener 1, Listener 2, Microtask 1, Microtask 2
+	// This happens because when we send an event from code,
+	// the callbacks will be called immediatelly(syncronous) without planning in the event loop.
+}
