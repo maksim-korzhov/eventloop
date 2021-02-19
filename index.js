@@ -295,3 +295,54 @@ function stepByStepExample() {
 		🍍 Second step
 	*/
 }
+
+function rAFExample() {
+	// Except the all queues named before there are one more queue - Render Queue.
+	// Browser calls repaint not on every iteration of the Event Loop.
+	// It calls it with frequency mor or less equal to the display refresh rate(f.e 60Hz).
+	// When it calls it - we repaint the value.
+	// 
+	// There are 5 steps
+	// 1. Done the tasks in the Call Stack.
+	// 2. Goes to the first of the repaint steps - requestAnimationFrame step
+	//    At this step we calculate the callback of the requestAnimationFrame function.
+	// 3. Style calculation step - calculating the styles for each element
+	// 4. Layout calculation step - build the render tree and figure out where each element should be.
+	// 5. Pixel painting step - create an actual pixel data, actual painting.
+	
+	document.addEventListener("click", function() {
+		// These 3 lines will be calculated on the task execution step,
+		// thats why the el will be moving only from 0 to 500px, not to 1000px
+		//
+		// el.style.transform = "translateX(1000px)";
+		// el.style.transition = "transform 1s ease-in-out";
+		// el.style.transform = "translateX(500px)";
+
+
+		// We can think about doing the last transform in the rAf,
+		// But it still will moving from 0 to 500px.
+		// Reason is simple - we calculate the first 2 lines in the Call Stack,
+		// but before the repaint we calculate a new value in the rAF.
+		// And only then - repaint.
+		//
+		// el.style.transform = "translateX(1000px)";
+		// el.style.transition = "transform 1s ease-in-out";
+
+		// requestAnimationFrame(() => {
+			// el.style.transform = "translateX(500px)";
+		// })
+
+
+		// Only solution - plan the next translate on the next rAF in the current rAF
+		//
+		// el.style.transform = "translateX(1000px)";
+		// el.style.transition = "transform 1s ease-in-out";
+
+		// requestAnimationFrame(() => {
+			// requestAnimationFrame(() => {
+				// el.style.transform = "translateX(500px)";
+			// })
+		// })
+		
+	});
+}
